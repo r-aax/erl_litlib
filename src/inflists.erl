@@ -8,9 +8,9 @@
 
 % Export.
 -export([iterate/3, iterate/2,
-	     hd/1, tl/1, ht/1,
-	     take/2,
-	     repeat/1, cycle/1, seq/2]).
+         hd/1, tl/1, ht/1,
+         take/2,
+         repeat/1, cycle/1, seq/2]).
 
 % We don't need hd and tl functions for lists because we use the same names for infinite lists.
 -compile({no_auto_import, [hd/1, tl/1]}).
@@ -25,9 +25,9 @@
 % Define infinite list as a record.
 -record(inflist,
 {
-	h :: term(),
-	acc :: term(),
-	f :: fun((term(), term()) -> {term(), term()})
+    h :: term(),
+    acc :: term(),
+    f :: fun((term(), term()) -> {term(), term()})
 }).
 
 % Infinite list.
@@ -38,20 +38,20 @@
 %---------------------------------------------------------------------------------------------------
 
 -spec iterate(H, Acc, F) -> inflist()
-	  when F :: fun((H, Acc) -> {H, Acc}),
-	  	   H :: term(),
-	  	   Acc :: term().
+      when F :: fun((H, Acc) -> {H, Acc}),
+           H :: term(),
+           Acc :: term().
 %% @doc
 %% Create infinite list with head, accumulator and iterate function.
 iterate(H, Acc, F) when is_function(F, 2) ->
-	#inflist
-	{
-		h = H,
-		acc = Acc,
-		f = F
-	};
+    #inflist
+    {
+        h = H,
+        acc = Acc,
+        f = F
+    };
 iterate(_, _, F) ->
-	throw({badarg, {F, wrong_arity}}).
+    throw({badarg, {F, wrong_arity}}).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -61,16 +61,16 @@ iterate(_, _, F) ->
 %% @doc
 %% Create infinite list with head and iterate function (without accumulator).
 iterate(H, F) when is_function(F, 1) ->
-	iterate
-	(
-		H,
-		none,
-		fun(Cur_H, _) ->
-			{F(Cur_H), none}
-		end
-	);
+    iterate
+    (
+        H,
+        none,
+        fun(Cur_H, _) ->
+            {F(Cur_H), none}
+        end
+    );
 iterate(_, F) ->
-	throw({badarg, {F, wrong_arity}}).
+    throw({badarg, {F, wrong_arity}}).
  
 %---------------------------------------------------------------------------------------------------
 % Take list elements and sublists.
@@ -80,7 +80,7 @@ iterate(_, F) ->
 %% @doc
 %% Infinite list head.
 hd(IL) when is_record(IL, inflist) ->
-	IL#inflist.h.
+    IL#inflist.h.
 
 %---------------------------------------------------------------------------------------------------
 
@@ -88,8 +88,8 @@ hd(IL) when is_record(IL, inflist) ->
 %% @doc
 %% Infinite list tail.
 tl(#inflist{h = H, acc = Acc, f = F} = IL) ->
-	{New_H, New_Acc} = F(H, Acc),
-	IL#inflist{h = New_H, acc = New_Acc}.
+    {New_H, New_Acc} = F(H, Acc),
+    IL#inflist{h = New_H, acc = New_Acc}.
 
 %---------------------------------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ tl(#inflist{h = H, acc = Acc, f = F} = IL) ->
 %% @doc
 %% Infinite list head and tail.
 ht(IL) ->
-	{hd(IL), tl(IL)}.
+    {hd(IL), tl(IL)}.
 
 %---------------------------------------------------------------------------------------------------
 
@@ -105,9 +105,9 @@ ht(IL) ->
 %% @doc
 %% Take first elements of the infinite list.
 take(_, N) when (N < 0) ->
-	throw({badarg, N});
+    throw({badarg, N});
 take(IL, N) ->
-	take (IL, N, []).
+    take (IL, N, []).
 
 -spec take(IL :: inflist(), N :: integer(), [E]) -> [E]
       when E :: term().
@@ -115,9 +115,9 @@ take(IL, N) ->
 %% @doc
 %% Take first elements of the infinite list.
 take(_, 0, R) ->
-	lists:reverse(R);
+    lists:reverse(R);
 take(IL, N, R) ->
-	take(tl(IL), N - 1, [hd(IL) | R]).
+    take(tl(IL), N - 1, [hd(IL) | R]).
 
 %---------------------------------------------------------------------------------------------------
 % Simple infinite lists.
@@ -128,7 +128,7 @@ take(IL, N, R) ->
 %% Haskell like repeat function.
 %% T -> [T, T, ..]
 repeat(T) ->
-	iterate(T, fun(_) -> T end).
+    iterate(T, fun(_) -> T end).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -138,18 +138,18 @@ repeat(T) ->
 %% Constructs infinite list, containing infinite number of list L copies.
 %% [A, B, C] -> [A, B, C, A, B, C, ..]
 cycle([]) ->
-	throw({badarg, []});
+    throw({badarg, []});
 cycle([H | T]) ->
-	iterate
-	(
-		H, T,
-		fun
-			(_, []) ->
-				{H, T};
-			(_, [Cur_H | Cur_T]) ->
-				{Cur_H, Cur_T}
-		end
-	).
+    iterate
+    (
+        H, T,
+        fun
+            (_, []) ->
+                {H, T};
+            (_, [Cur_H | Cur_T]) ->
+                {Cur_H, Cur_T}
+        end
+    ).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -157,6 +157,6 @@ cycle([H | T]) ->
 %% @doc
 %% Arithmetic series.
 seq(From, Step) ->
-	iterate(From, fun(H) -> H + Step end).
+    iterate(From, fun(H) -> H + Step end).
 
 %---------------------------------------------------------------------------------------------------
