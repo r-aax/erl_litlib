@@ -18,7 +18,7 @@
          iterate/3, iterate/2,
          % Get infinite lists parts.
          hd/1, tl/1, ht/1,
-         take/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
+         take/2, is_begin/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
          % Basic simple infinite lists.
          repeat/1, cycle/1,
          % Arithmetic series.
@@ -63,6 +63,11 @@ take_drop_sublist_split_test() ->
     IL2 = cycle([1, 2, 3]),
     ?assertEqual([a, a, a, a, a], take(drop(IL1, 5), 5)),
     ?assertEqual([3, 1, 2, 3, 1], take(drop(IL2, 5), 5)),
+    ?assert(is_begin(IL1, [a, a, a])),
+    ?assert(is_begin(IL1, [a, a, a, a, a])),
+    ?assert(is_begin(IL2, [1, 2, 3, 1, 2, 3, 1, 2])),
+    ?assert(is_begin(IL2, [])),
+    ?assert(not is_begin(IL2, [3, 2, 1])),
     ?assertEqual(a, nth(IL1, 5)),
     ?assertEqual(2, nth(IL2, 5)),
     ?assertMatch({[1, 2, 3, 1], _}, split(IL2, 4)),

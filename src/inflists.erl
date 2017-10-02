@@ -14,7 +14,7 @@
          iterate/3, iterate/2,
          % Get infinite lists parts.
          hd/1, tl/1, ht/1,
-         take/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
+         take/2, is_begin/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
          % Basic simple infinite lists.
          repeat/1, cycle/1,
          % Arithmetic series.
@@ -150,6 +150,24 @@ take(_, 0, R) ->
     lists:reverse(R);
 take(IL, N, R) ->
     take(tl(IL), N - 1, [hd(IL) | R]).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec is_begin(IL :: inflist(), B :: term() | list()) -> boolean().
+%% @doc
+%% Check if infinite list begins with given term or list.
+is_begin(IL, T) when not is_list(T) ->
+    hd(IL) =:= T;
+is_begin(IL, []) when is_record(IL, inflist) ->
+    true;
+is_begin(IL, [H | T]) ->
+    {IH, IT} = ht(IL),
+    if
+        (IH =:= H) ->
+            is_begin(IT, T);
+        true ->
+            false
+    end.
 
 %---------------------------------------------------------------------------------------------------
 
