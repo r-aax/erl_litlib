@@ -26,8 +26,8 @@
          % High order functions.
          map/2, filter/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
          % Mathematical functions.
-         add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, cube/1,
-         pow/2, npow/2,
+         add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, ndvs/2, nrem/2,
+         square/1, sqrt/1, cube/1, pow/2, npow/2,
          % More complex mathematical functions.
          pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
          dirichlet_series/1, dirichlet_series/2, sign_alternate/1,
@@ -727,6 +727,46 @@ dvs(A, B) ->
 %% Invert list.
 inv(IL) ->
     map(IL, fun(X) -> 1 / X end).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec ndvs(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
+%% @doc
+%% Division without remainder (for natural numbers).
+ndvs(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> X div Y end);
+        Is_A ->
+            map(A, fun(X) -> X div B end);
+        Is_B ->
+            map(B, fun(X) -> A div X end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec nrem(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
+%% @doc
+%% Get remainder (infinite list of remainders).
+nrem(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> X rem Y end);
+        Is_A ->
+            map(A, fun(X) -> X rem B end);
+        Is_B ->
+            map(B, fun(X) -> A rem X end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
 
 %---------------------------------------------------------------------------------------------------
 

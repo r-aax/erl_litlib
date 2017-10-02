@@ -30,8 +30,8 @@
          % High order functions.
          map/2, filter/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
          % Mathematical functions.
-         add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, cube/1,
-         pow/2, npow/2,
+         add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, ndvs/2, nrem/2,
+         square/1, sqrt/1, cube/1, pow/2, npow/2,
          % More complex mathematical functions.
          pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
          dirichlet_series/1, dirichlet_series/2, sign_alternate/1,
