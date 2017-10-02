@@ -832,9 +832,10 @@ npows(N, IL) ->
         fun(P) ->
             N_Pow =
                 fun
-                    NP_(N_, 1) ->
-                        N_;
-                    NP_(N_, P_) when (P_ > 1) ->
+                    % We need x^0 for sequences 1, x, x^2, ..
+                    NP_(_, 0) ->
+                        1;
+                    NP_(N_, P_) when (P_ > 0) ->
                         N_ * NP_(N_, P_ - 1)
                 end,
             N_Pow(N, P)
