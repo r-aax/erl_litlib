@@ -26,7 +26,8 @@
          % High order functions.
          map/2, filter/2, adj_pairs_map/2, fold/3, is_all/3, is_any/3,
          % Mathematical functions.
-         add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, ndvs/2, nrem/2,
+         add/2, inc/1, sub/2, dec/1, neg/1,
+         mul/2, twice/1, dvs/2, half/1, inv/1, ndvs/2, nhalf/1, nrem/2,
          square/1, sqrt/1, cube/1, pow/2, npow/2,
          % More complex mathematical functions.
          pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
@@ -886,6 +887,19 @@ mul(A, B) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec twice(IL :: inflist()) -> inflist().
+%% @doc
+%% Twice infinite list.
+%%
+%% Example:
+%% <pre>
+%% twice([A1, A2, A3, A4, ..]) -> [2 * A1, 2 * A2, 2 * A3, 2 * A4, ..]
+%% </pre>
+twice(IL) ->
+    mul(IL, 2).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec dvs(Arg, Arg) -> inflist()
       when Arg :: inflist() | term().
 %% @doc
@@ -914,6 +928,19 @@ dvs(A, B) ->
         true ->
             throw({badarg, {A, B}})
     end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec half(IL :: inflist()) -> inflist().
+%% @doc
+%% Half all elements of infinite list.
+%%
+%% Example:
+%% <pre>
+%% half([A1, A2, A3, A4, ..]) -> [A1 / 2, A2 / 2, A3 / 2, A4 / 2, ..]
+%% </pre>
+half(IL) ->
+    dvs(IL, 2).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -960,6 +987,19 @@ ndvs(A, B) ->
         true ->
             throw({badarg, {A, B}})
     end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec nhalf(IL :: inflist()) -> inflist().
+%% @doc
+%% Divide each element of infinite list on 2 (integer division).
+%%
+%% Example:
+%% <pre>
+%% nhalf([A1, A2, A3, A4, ..]) -> [A1 div 2, A2 div 2, A3 div 2, A4 div 2, ..]
+%% </pre>
+nhalf(IL) ->
+    ndvs(IL, 2).
 
 %---------------------------------------------------------------------------------------------------
 
