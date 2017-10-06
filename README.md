@@ -1,9 +1,13 @@
-erl_litlib
-=====
+# erl_litlib
 
-An OTP application
+Erlang little library for various purposes.
 
-Build
------
+## inflists
 
-    $ rebar3 compile
+Module for infinite lists support - lists containing infinite number of elements.
+
+# Build
+
+```
+$ rebar3 compile
+```
