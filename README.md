@@ -15,7 +15,7 @@ Module for infinite lists support - lists containing infinite number of elements
 }).
 ```
 
-Main functions:
+###### Main functions:
 
 - Constructors:
 
@@ -30,7 +30,8 @@ hd/1, tl/1, ht/1, take/2,
 is_begin/2,
 nth/2,
 drop/2, drop_less/2, nthtail/2,
-sublist/2, sublist/3, split/2
+sublist/2, sublist/3, split/2,
+find/2
 ```
 
 - Basic simple infinite lists:
@@ -75,7 +76,6 @@ square/1, sqrt/1, cube/1, pow/2, npow/2
 - More complex mathematical functions:
 
 ```Erlang
-pows/2, npows/2,
 partial_sums/1, partial_products/1, partial_avgs/1,
 dirichlet_series/1, dirichlet_series/2, sign_alternate/1
 ```
@@ -124,6 +124,32 @@ taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1
 
 ```Erlang
 mono_merge/2, mono_unique/1, mono_union/2, mono_intersection/2, mono_complement/2
+```
+
+###### Usage examples
+
+How to calculate e with series?
+
+```Erlang
+nth(pow(inc(harmonic_series()), naturals()), 1000).
+2.7169239322355936
+
+nth(partial_sums(inv_facts()), 100).
+2.7182818284590455
+```
+
+How many prime numbers between 10000 and 100000?
+
+```Erlang
+find(drop_less(primes(), 10000), fun(X) -> X > 100000 end) - 1.
+8363
+```
+
+How to find first 100000n + 1 prime?
+
+```Erlang
+hd(mono_intersection(primes(), inc(mul(100000, naturals())))).
+700001
 ```
 
 # Build
