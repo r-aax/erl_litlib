@@ -24,7 +24,7 @@
          % Zip/unzip.
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          % High order functions.
-         map/2, filter/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
+         map/2, filter/2, adj_pairs_map/2, fold/3, is_all/3, is_any/3,
          % Mathematical functions.
          add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, ndvs/2, nrem/2,
          square/1, sqrt/1, cube/1, pow/2, npow/2,
@@ -639,7 +639,7 @@ map(IL, Map_F) ->
 %% IL = [1, 2, 3, 4, 5, 6, ..]
 %%
 %% filter(IL, fun(X) -> X rem 2 =:= 1 end) -> [1, 3, 5, 7, ..]
-%% filter(IL, fun(X) -> X < 0 end) -> infinite loop
+%% filter(IL, fun(X) -> X =:= 0 end) -> infinite loop
 %% </pre>
 filter(IL, Filter_F) ->
     New_IL =
@@ -1131,7 +1131,7 @@ npows(N, IL) ->
 %%                     ..]
 %% </pre>
 partial_sums(IL) ->
-    mapfold(IL, fun(X, Y) -> X + Y end, 0).
+    fold(IL, fun(X, Y) -> X + Y end, 0).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -1151,7 +1151,7 @@ partial_sums(IL) ->
 %%                         ..]
 %% </pre>
 partial_products(IL) ->
-    mapfold(IL, fun(X, Y) -> X * Y end, 1).
+    fold(IL, fun(X, Y) -> X * Y end, 1).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -1617,9 +1617,9 @@ taylor_lnxp1(X) ->
 %% @doc
 %% Taylor series of sin(x) for (-inf, inf).
 %% <pre>
-%%                     x^3   x^5
-%% taylor_sin(X) = x, - -----, + -----, - ...
-%%                      3!    5!
+%%                        X^3    X^5      X^7
+%% taylor_sin(X) = [X, - -----, -----, - -----, ..]
+%%                         3!     5!       7!
 %% </pre>
 taylor_sin(X) ->
     sign_alternate(evens(taylor_exp(X))).
@@ -1630,9 +1630,9 @@ taylor_sin(X) ->
 %% @doc
 %% Taylor series of cos(x) for (-inf, inf).
 %% <pre>
-%%              x^2   x^4
-%% cos(x) = 1 - --- + --- - ...
-%%               2!    4!
+%%                        X^2    X^4      X^6
+%% taylor_cos(X) = [1, - -----, -----, - -----, ..]
+%%                         2!     4!       6!
 %% </pre>
 taylor_cos(X) ->
     sign_alternate(odds(taylor_exp(X))).
@@ -1643,9 +1643,9 @@ taylor_cos(X) ->
 %% @doc
 %% Taylor series of arctg(x) for (-1, 1).
 %% <pre>
-%%                x^3   x^5
-%% arctg(x) = x - --- + --- - ...
-%%                 3     5
+%%                          X^3    X^5      X^7
+%% taylor_arctg(X) = [X, - -----, -----, - -----, ..]
+%%                           3      5        7
 %% </pre>
 taylor_arctg(X) when (abs(X) >= 1) ->
     throw({badarg, X});
@@ -1682,7 +1682,7 @@ mono_union(IL1, IL2) ->
 
 -spec mono_intersection(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
 %% @doc
-%% Union of two monotonous lists.
+%% Intersection of two monotonous lists.
 mono_intersection(IL1, IL2) ->
     IL =
         iterate

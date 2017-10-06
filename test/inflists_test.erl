@@ -28,7 +28,7 @@
          % Zip/unzip.
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          % High order functions.
-         map/2, filter/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
+         map/2, filter/2, adj_pairs_map/2, fold/3, is_all/3, is_any/3,
          % Mathematical functions.
          add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, ndvs/2, nrem/2,
          square/1, sqrt/1, cube/1, pow/2, npow/2,
@@ -162,12 +162,12 @@ map_test() ->
 
 %---------------------------------------------------------------------------------------------------
 
--spec mapfold_test() -> ok.
+-spec fold_test() -> ok.
 %% @doc
 %% Function mapfold test.
-mapfold_test() ->
+fold_test() ->
     IL1 = seq(1),
-    IL2 = mapfold(IL1, fun(X, Y) -> X + Y end, 0),
+    IL2 = fold(IL1, fun(X, Y) -> X + Y end, 0),
     ?assertEqual([1, 3, 6, 10, 15], take(IL2, 5)),
     ok.
 
