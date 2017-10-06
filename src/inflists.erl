@@ -62,7 +62,7 @@
     f :: fun((term(), term()) -> {term(), term()})
 }).
 
-% Inifinite list.
+% Inifinite list - list containing infinite number of element.
 -type inflist() :: #inflist{}.
 
 %---------------------------------------------------------------------------------------------------
@@ -75,6 +75,7 @@
            Acc :: term().
 %% @doc
 %% Create infinite list with head, accumulator and iterate function.
+%% Iterate function produces the second infinite list element from its head and accumulator.
 iterate(H, Acc, F) when is_function(F, 2) ->
     #inflist
     {
@@ -91,6 +92,7 @@ iterate(_, _, F) ->
       when H :: term().
 %% @doc
 %% Create infinite list with head and iterate function.
+%% Iterate function produces the second infinite list element from its head.
 iterate(H, F) when is_function(F, 1) ->
     iterate
     (
@@ -260,7 +262,11 @@ split(IL, N, R) ->
 -spec repeat(T :: term()) -> inflist().
 %% @doc
 %% Construct infinite list, containing one repeating element (Haskell analogue).
-%% T -> [T, T, ..]
+%%
+%% Example:
+%% <pre>
+%% repeat(T) -> [T, T, T, ..]
+%% </pre>
 repeat(T) ->
     iterate
     (
@@ -275,7 +281,11 @@ repeat(T) ->
 -spec cycle(L :: list()) -> inflist().
 %% @doc
 %% Construct infinite list, containing infinite number of list L copies (Haskell analogue).
-%% [A, B, C] -> [A, B, C, A, B, C, ..]
+%%
+%% Example:
+%% <pre>
+%% repeat([A, B, C]) -> [A, B, C, A, B, C, ..]
+%% </pre>
 cycle([]) ->
     throw({badarg, []});
 cycle([H | T]) ->
@@ -297,7 +307,12 @@ cycle([H | T]) ->
 
 -spec seq(From :: number(), Step :: number()) -> inflist().
 %% @doc
-%% Construct inflinite list [From, From + Step, From + 2 * Step, ..].
+%% Construct arithmetic series.
+%%
+%% Example:
+%% <pre>
+%% seq(From, Step) -> [From, From + Step, From + 2 * Step, ..]
+%% </pre>
 seq(From, Step) ->
     iterate
     (
@@ -312,6 +327,11 @@ seq(From, Step) ->
 -spec odds() -> inflist().
 %% @doc
 %% Odd natural numbers.
+%%
+%% Example:
+%% <pre>
+%% odds() -> [1, 3, 5, 7, 9, ..]
+%% </pre>
 odds() ->
     seq(1, 2).
 
@@ -320,6 +340,11 @@ odds() ->
 -spec evens() -> inflist().
 %% @doc
 %% Even natural numbers.
+%%
+%% Example:
+%% <pre>
+%% evens() -> [2, 4, 6, 8, 10, ..]
+%% </pre>
 evens() ->
     seq(2, 2).
 
@@ -327,7 +352,13 @@ evens() ->
 
 -spec seq(From :: number()) -> inflist().
 %% @doc
-%% Construct infinite list [From, From + 1, From + 2, ..] (synonym for naturals).
+%% Construct infinite list of naturals from given number.
+%%
+%% Example:
+%% <pre>
+%% seq(From) -> [From, From + 1, From + 2, ..]
+%% </pre>
+%%
 %% @see naturals/1
 seq(From) ->
     seq(From, 1).
@@ -337,6 +368,11 @@ seq(From) ->
 -spec naturals() -> inflist().
 %% @doc
 %% Infinite list of natural numbers.
+%%
+%% Example:
+%% <pre>
+%% naturals() -> [1, 2, 3, 4, 5, ..]
+%% </pre>
 naturals() ->
     seq(1).
 
@@ -345,6 +381,12 @@ naturals() ->
 -spec naturals(From :: integer()) -> inflist().
 %% @doc
 %% Naturals from given number (synonym for seq).
+%%
+%% Example:
+%% <pre>
+%% seq(From) -> [From, From + 1, From + 2, ..]
+%% </pre>
+%%
 %% @see seq/1
 naturals(From) ->
     seq(From).
@@ -356,6 +398,11 @@ naturals(From) ->
 -spec geometric_series(Base :: number(), K :: number()) -> inflist().
 %% @doc
 %% Construct infinite list [Base, Base * K, Base * K^2, ..].
+%%
+%% Example:
+%% <pre>
+%% geometric_series(Base, K) -> [Base, Base * K, Base * K^2, Base * K^3, ..]
+%% </pre>
 geometric_series(Base, K) ->
     iterate
     (
@@ -370,6 +417,11 @@ geometric_series(Base, K) ->
 -spec power_series(X :: number()) -> inflist().
 %% @doc
 %% Series of number powers.
+%%
+%% Example:
+%% <pre>
+%% power_series(X) -> [1, X, X^2, X^3, ..]
+%% </pre>
 power_series(X) ->
     geometric_series(1, X).
 
@@ -380,6 +432,14 @@ power_series(X) ->
 -spec zip(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
 %% @doc
 %% Zip two infinite lists.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a5, ..]
+%% B = [b1, b2, b3, b4, b5, ..]
+%% 
+%% zip(A, B) -> [{a1, b1}, {a2, b2}, {a3, b3}, {a4, b4}, {a5, b5}, ..]
+%% </pre>
 zip(#inflist{h = H1, acc = Acc1, f = F1}, #inflist{h = H2, acc = Acc2, f = F2}) ->
     iterate
     (
@@ -399,6 +459,15 @@ zip(IL1, IL2) ->
 -spec zip_3(IL1 :: inflist(), IL2 :: inflist(), IL3 :: inflist()) -> inflist().
 %% @doc
 %% Zip three infinite lists.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a5, ..]
+%% B = [b1, b2, b3, b4, b5, ..]
+%% C = [c1, c2, c3, c4, c5, ..]
+%%
+%% zip_3(A, B, C) -> [{a1, b1, c1}, {a2, b2, c2}, {a3, b3, c3}, ..]
+%% </pre>
 zip_3(#inflist{h = H1, acc = Acc1, f = F1},
       #inflist{h = H2, acc = Acc2, f = F2},
       #inflist{h = H3, acc = Acc3, f = F3}) ->
@@ -424,6 +493,14 @@ zip_3(IL1, IL2, IL3) ->
       T2 :: term().
 %% @doc
 %% Zip two infinite lists with given function.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a5, ..]
+%% B = [b1, b2, b3, b4, b5, ..]
+%%
+%% zipwith(A, B, Zip_F) -> [Zip_F(a1, b1), Zip_F(a2, b2), Zip_F(a3, b3), ..]
+%% </pre>
 zipwith(#inflist{h = H1, acc = Acc1, f = F1},
         #inflist{h = H2, acc = Acc2, f = F2},
         Zip_F) when is_function(Zip_F, 2) ->
@@ -445,6 +522,13 @@ zipwith(IL1, IL2, Zip_F) ->
 -spec unzip(IL :: inflist()) -> {inflist(), inflist()}.
 %% @doc
 %% Unzip infinite list into two lists.
+%%
+%% Example:
+%% <pre>
+%% IL = [{a1, b1}, {a2, b2}, {a3, b3}, {a4, b4}, {a5, b5}, ..]
+%%
+%% unzip(IL) -> {[a1, a2, a3, a4, a5, ..], [b1, b2, b3, b4, b5, ..]}
+%% </pre>
 unzip(#inflist{h = {H1, H2}, acc = {Acc1, Acc2}, f = F}) ->
     {
         iterate
@@ -474,6 +558,13 @@ unzip(IL) ->
 -spec unzip_3(IL :: inflist()) -> {inflist(), inflist(), inflist()}.
 %% @doc
 %% Unzip infinite list into three lists.
+%%
+%% Example:
+%% <pre>
+%% IL = [{a1, b1, c1}, {a2, b2, c2}, {a3, b3, c3}, {a4, b4, c4}, ..]
+%%
+%% unzip_3(IL) -> {[a1, a2, a3, a4, ..], [b1, b2, b3, b4, ..], [c1, c2, c3, c4, ..]}
+%% </pre>
 unzip_3(#inflist{h = {H1, H2, H3}, acc = {Acc1, Acc2, Acc3}, f = F}) ->
     {
         iterate
@@ -514,6 +605,13 @@ unzip_3(IL) ->
 -spec map(IL :: inflist(), Map_F :: fun((term()) -> term())) -> inflist().
 %% @doc
 %% Apply function to every element of infinite list.
+%%
+%% Example:
+%% <pre>
+%% IL = [a1, a2, a4, a4, a5, ..]
+%%
+%% map(IL, Map_F) -> [Map_F(a1), Map_F(a2), Map_F(a3), Map_F(a4), Map_F(a5), ..]
+%% </pre>
 map(#inflist{h = H, acc = Acc, f = F}, Map_F) when is_function(Map_F, 1) ->
     iterate
     (
@@ -532,8 +630,17 @@ map(IL, Map_F) ->
 -spec filter(IL :: inflist(), Filter_F :: fun((term()) -> boolean())) -> inflist().
 %% @doc
 %% Filter infinite list.
-%% Warning! Dangerous function.
+%% Warning!
+%% Dangerous function.
 %% It can cause infinite recursion if result list is not finite. 
+%%
+%% Example:
+%% <pre>
+%% IL = [1, 2, 3, 4, 5, 6, ..]
+%%
+%% filter(IL, fun(X) -> X rem 2 =:= 1 end) -> [1, 3, 5, 7, ..]
+%% filter(IL, fun(X) -> X < 0 end) -> infinite loop
+%% </pre>
 filter(IL, Filter_F) ->
     New_IL =
         iterate
@@ -559,17 +666,36 @@ filter(IL, Filter_F) ->
 -spec adj_pairs_map(IL :: inflist(), Map_F :: fun((term(), term()) -> term())) -> inflist().
 %% @doc
 %% Apply map function to every pair of adjacent elements.
+%%
+%% Example:
+%% <pre>
+%% IL = [a1, a2, a3, a4, a5, ..]
+%%
+%% adj_pairs_map(IL, Map_F) -> [Map_F(a1, a2), Map_F(a2, a3), Map_F(a3, a4), ..]
+%% </pre>
 adj_pairs_map(IL, Map_F) ->
     zipwith(IL, tl(IL), Map_F).
 
 %---------------------------------------------------------------------------------------------------
 
--spec mapfold(IL :: inflist(), Fold_F :: fun((term(), Fold_Acc) -> Fold_Acc), Fold_Acc) -> inflist()
+-spec fold(IL :: inflist(), Fold_F :: fun((term(), Fold_Acc) -> Fold_Acc), Fold_Acc) -> inflist()
       when Fold_Acc :: term().
 %% @doc
-%% Fold infinite list with saving accumulators.
+%% Partial folds of sublists.
 %% Note. We will never reach fold result because list is infinite.
-mapfold(#inflist{h = H, acc = Acc, f = F}, Fold_F, Fold_Acc) when is_function(Fold_F, 2) ->
+%%
+%% Example:
+%% <pre>
+%% IL = [a1, a2, a3, a4, a5, ..]
+%%
+%% fold(IL, Fold_F) -> [lists:foldl(Fold_F, Fold_Acc, [a1]),
+%%                      lists:foldl(Fold_F, Fold_Acc, [a1, a2]),
+%%                      lists:foldl(Fold_F, Fold_Acc, [a1, a2, a3]),
+%%                      lists:foldl(Fold_F, Fold_Acc, [a1, a2, a3, a4]),
+%%                      lists:foldl(Fold_F, Fold_Acc, [a1, a2, a3, a4, a5]),
+%%                      ..]
+%% </pre>
+fold(#inflist{h = H, acc = Acc, f = F}, Fold_F, Fold_Acc) when is_function(Fold_F, 2) ->
     iterate
     (
         Fold_F(H, Fold_Acc),
@@ -579,7 +705,7 @@ mapfold(#inflist{h = H, acc = Acc, f = F}, Fold_F, Fold_Acc) when is_function(Fo
             {Fold_F(New_H, Cur_Fold_Acc), {New_H, New_Acc}}
         end
     );
-mapfold(IL, Fold_F, Fold_Acc) ->
+fold(IL, Fold_F, Fold_Acc) ->
     throw({badarg, {IL, Fold_F, Fold_Acc}}).
 
 %---------------------------------------------------------------------------------------------------
@@ -622,6 +748,17 @@ is_any(IL, Pred, N) when (N > 0) ->
       when Arg :: inflist() | term().
 %% @doc
 %% Add function.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
+%%
+%% add(A, B) -> [A1 + B1, A2 + B2, A3 + B3, A4 + B4, A5 + B5, ..]
+%% add(A, V) -> [A1 + V, A2 + V, A3 + V, A4 + V, A5 + V, ..]
+%% add(V, A) -> [V + A1, V + A2, V + A3, V + A4, V + A5, ..]
+%% </pre>
 add(A, B) ->
     Is_A = is_record(A, inflist),
     Is_B = is_record(B, inflist),
@@ -641,6 +778,13 @@ add(A, B) ->
 -spec inc(IL :: inflist()) -> inflist().
 %% @doc
 %% Increment.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% inc(A) -> [A1 + 1, A2 + 1, A3 + 1, A4 + 1, A5 + 1, ..]
+%% </pre>
 inc(IL) ->
     add(IL, 1).
 
@@ -650,6 +794,17 @@ inc(IL) ->
       when Arg :: inflist() | term().
 %% @doc
 %% Sub function.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
+%%
+%% sub(A, B) -> [A1 - B1, A2 - B2, A3 - B3, A4 - B4, A5 - B5, ..]
+%% sub(A, V) -> [A1 - V, A2 - V, A3 - V, A4 - V, A5 - V, ..]
+%% sub(V, A) -> [V - A1, V - A2, V - A3, V - A4, V - A5, ..]
+%% </pre>
 sub(A, B) ->
     Is_A = is_record(A, inflist),
     Is_B = is_record(B, inflist),
@@ -669,6 +824,13 @@ sub(A, B) ->
 -spec dec(IL :: inflist()) -> inflist().
 %% @doc
 %% Decrement.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% dec(A) -> [A1 - 1, A2 - 1, A3 - 1, A4 - 1, A5 - 1, ..]
+%% </pre>
 dec(IL) ->
     sub(IL, 1).
 
@@ -677,6 +839,13 @@ dec(IL) ->
 -spec neg(IL :: inflist()) -> inflist().
 %% @doc
 %% Negate infinite list.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% neg(A) -> [-A1, -A2, -A3, -A4, -A5, ..]
+%% </pre>
 neg(IL) ->
     map(IL, fun(X) -> -X end).
 
@@ -686,6 +855,17 @@ neg(IL) ->
       when Arg :: inflist() | term().
 %% @doc
 %% Multiplication.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
+%%
+%% mul(A, B) -> [A1 * B1, A2 * B2, A3 * B3, A4 * B4, A5 * B5, ..]
+%% mul(A, V) -> [A1 * V, A2 * V, A3 * V, A4 * V, A5 * V, ..]
+%% mul(V, A) -> [V * A1, V * A2, V * A3, V * A4, V * A5, ..]
+%% </pre>
 mul(A, B) ->
     Is_A = is_record(A, inflist),
     Is_B = is_record(B, inflist),
@@ -706,6 +886,17 @@ mul(A, B) ->
       when Arg :: inflist() | term().
 %% @doc
 %% Division.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
+%%
+%% dvs(A, B) -> [A1 / B1, A2 / B2, A3 / B3, A4 / B4, A5 / B5, ..]
+%% dvs(A, V) -> [A1 / V, A2 / V, A3 / V, A4 / V, A5 / V, ..]
+%% dvs(V, A) -> [V / A1, V / A2, V / A3, V / A4, V / A5, ..]
+%% </pre>
 dvs(A, B) ->
     Is_A = is_record(A, inflist),
     Is_B = is_record(B, inflist),
@@ -724,7 +915,14 @@ dvs(A, B) ->
 
 -spec inv(IL :: inflist()) -> inflist().
 %% @doc
-%% Invert list.
+%% Infinite list of inverted values.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% inv(A) -> [1 / A1, 1 / A2, 1 / A3, 1 / A4, 1 / A5, ..]
+%% </pre>
 inv(IL) ->
     map(IL, fun(X) -> 1 / X end).
 
@@ -734,6 +932,17 @@ inv(IL) ->
       when Arg :: inflist() | term().
 %% @doc
 %% Division without remainder (for natural numbers).
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
+%%
+%% ndvs(A, B) -> [A1 div B1, A2 div B2, A3 div B3, A4 div B4, A5 div B5, ..]
+%% ndvs(A, V) -> [A1 div V, A2 div V, A3 div V, A4 div V, A5 div V, ..]
+%% ndvs(V, A) -> [V div A1, V div A2, V div A3, V div A4, V div A5, ..]
+%% </pre>
 ndvs(A, B) ->
     Is_A = is_record(A, inflist),
     Is_B = is_record(B, inflist),
@@ -754,6 +963,17 @@ ndvs(A, B) ->
       when Arg :: inflist() | term().
 %% @doc
 %% Get remainder (infinite list of remainders).
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
+%%
+%% nrem(A, B) -> [A1 rem B1, A2 rem B2, A3 rem B3, A4 rem B4, A5 rem B5, ..]
+%% nrem(A, V) -> [A1 rem V, A2 rem V, A3 rem V, A4 rem V, A5 rem V, ..]
+%% nrem(V, A) -> [V rem A1, V rem A2, V rem A3, V rem A4, V rem A5, ..]
+%% </pre>
 nrem(A, B) ->
     Is_A = is_record(A, inflist),
     Is_B = is_record(B, inflist),
@@ -773,6 +993,13 @@ nrem(A, B) ->
 -spec square(IL :: inflist()) -> inflist().
 %% @doc
 %% Infinite list of squares.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% square(A) -> [A1^2, A2^2, A3^2, A4^2, A5^2, ..]
+%% </pre>
 square(IL) ->
     mul(IL, IL).
 
@@ -781,6 +1008,13 @@ square(IL) ->
 -spec sqrt(IL :: inflist()) -> inflist().
 %% @doc
 %% Square root of infinite list.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% sqrt(A) -> [sqrt(A1), sqrt(A2), sqrt(A3), sqrt(A4), sqrt(A5), ..]
+%% </pre>
 sqrt(IL) ->
     map(IL, fun(X) -> math:sqrt(X) end).
 
@@ -788,7 +1022,14 @@ sqrt(IL) ->
 
 -spec cube(IL :: inflist()) -> inflist().
 %% @doc
-%% Cobe of infinite list.
+%% Cube of infinite list.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% cube(A) -> [A1^3, A2^3, A3^3, A4^3, A5^3, ..]
+%% </pre>
 cube(IL) ->
     mul(square(IL), IL).
 
@@ -797,6 +1038,13 @@ cube(IL) ->
 -spec pow(IL :: inflist(), P :: number()) -> inflist().
 %% @doc
 %% Power of infinite list.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% pow(A, P) -> [A1^P, A2^P, A3^P, A4^P, A5^P, ..]
+%% </pre>
 pow(IL, P) ->
     map(IL, fun(X) -> math:pow(X, P) end).
 
@@ -804,7 +1052,14 @@ pow(IL, P) ->
 
 -spec npow(IL :: inflist(), P :: number()) -> inflist().
 %% @doc
-%% Power of infinite list.
+%% Power of infinite list (for natural numbers).
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% npow(A, P) -> [A1^P, A2^P, A3^P, A4^P, A5^P, ..]
+%% </pre>
 npow(IL, 1) ->
     IL;
 npow(IL, P) when (P > 1) ->
@@ -817,6 +1072,13 @@ npow(IL, P) when (P > 1) ->
 -spec pows(N :: number(), IL :: inflist()) -> inflist().
 %% @doc
 %% Return powers of given number (powers are taken from IL).
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% pows = [N^A1, N^A2, N^A3, N^A4, N^A5, ..]
+%% </pre>
 pows(N, IL) ->
     map(IL, fun(X) -> math:pow(N, X) end).
 
@@ -825,6 +1087,13 @@ pows(N, IL) ->
 -spec npows(N :: number(), IL :: inflist()) -> inflist().
 %% @doc
 %% Return natural powers of given number (powers are taken from IL).
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% pows = [N^A1, N^A2, N^A3, N^A4, N^A5, ..]
+%% </pre>
 npows(N, IL) ->
     map
     (
@@ -849,6 +1118,18 @@ npows(N, IL) ->
 -spec partial_sums(IL :: inflist()) -> inflist().
 %% @doc
 %% Partial sums.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% partial_sums(A) -> [A1, 
+%%                     A1 + A2,
+%%                     A1 + A2 + A3,
+%%                     A1 + A2 + A3 + A4,
+%%                     A1 + A2 + A3 + A4 + A5,
+%%                     ..]
+%% </pre>
 partial_sums(IL) ->
     mapfold(IL, fun(X, Y) -> X + Y end, 0).
 
@@ -857,6 +1138,18 @@ partial_sums(IL) ->
 -spec partial_products(IL :: inflist()) -> inflist().
 %% @doc
 %% Partial products.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% partial_products(A) -> [A1, 
+%%                         A1 * A2,
+%%                         A1 * A2 * A3,
+%%                         A1 * A2 * A3 * A4,
+%%                         A1 * A2 * A3 * A4 * A5,
+%%                         ..]
+%% </pre>
 partial_products(IL) ->
     mapfold(IL, fun(X, Y) -> X * Y end, 1).
 
@@ -865,6 +1158,18 @@ partial_products(IL) ->
 -spec partial_avgs(IL :: inflist()) -> inflist().
 %% @doc
 %% Average values of infinite list.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% partial_avgs(A) -> [A1, 
+%%                     (A1 + A2) / 2,
+%%                     (A1 + A2 + A3) / 3,
+%%                     (A1 + A2 + A3 + A4) / 4,
+%%                     (A1 + A2 + A3 + A4 + A5) / 5,
+%%                     ..]
+%% </pre>
 partial_avgs(IL) ->
     dvs(partial_sums(IL), naturals()).
 
@@ -872,7 +1177,14 @@ partial_avgs(IL) ->
 
 -spec dirichlet_series(S :: number()) -> inflist().
 %% @doc
-%% Dirichlet series sum 1 / n^s.
+%% Dirichlet series.
+%%
+%% Example:
+%% <pre>
+%%                              1      1      1      1 
+%% dirichlet_series(S) -> [1, -----, -----, -----, -----, ..]
+%%                             2^S    3^S    4^S    5^S
+%% </pre>
 dirichlet_series(S) ->
     pow(harmonic_series(), S).
 
@@ -881,6 +1193,15 @@ dirichlet_series(S) ->
 -spec dirichlet_series(IL :: inflist(), S :: number()) -> inflist().
 %% @doc
 %% Dirichlet series of base inflist IL and pow degree S.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%%                               A2     A3     A4     A5 
+%% dirichlet_series(S) -> [A1, -----, -----, -----, -----, ..]
+%%                              2^S    3^S    4^S    5^S
+%% </pre>
 dirichlet_series(IL, S) ->
     mul(IL, dirichlet_series(S)).
 
@@ -890,6 +1211,13 @@ dirichlet_series(IL, S) ->
 %% @doc
 %% Alternate sign of infinite list.
 %% Odd position elements are unchanged, even position elements are negated.
+%%
+%% Example:
+%% <pre>
+%% A = [A1, A2, A3, A4, A5, ..]
+%%
+%% sign_alternate(A) -> [A1, -A2, A3, -A4, A5, ..]
+%% </pre>
 sign_alternate(IL) ->
     mul(IL, grundy_series()).
 
@@ -900,6 +1228,11 @@ sign_alternate(IL) ->
 -spec fib() -> inflist().
 %% @doc
 %% Fibonacci numbers.
+%%
+%% Example:
+%% <pre>
+%% fib() -> [1, 1, 2, 3, 5, 8, 13, 21, ..]
+%% </pre>
 fib() ->
     iterate
     (
@@ -915,6 +1248,13 @@ fib() ->
 -spec harmonic_series() -> inflist().
 %% @doc
 %% Harmonic series.
+%%
+%% Example:
+%% <pre>
+%%                           1    1    1    1    1    1  
+%% harmonic_series() -> [1, ---, ---, ---, ---, ---, ---, ..]
+%%                           2    3    4    5    6    7
+%% </pre>
 harmonic_series() ->
     inv(naturals()).
 
@@ -923,6 +1263,13 @@ harmonic_series() ->
 -spec anharmonic_series() -> inflist().
 %% @doc
 %% Anharmonic series (Leibniz series).
+%%
+%% Example:
+%% <pre>
+%%                               1    1      1    1   
+%% anharmonic_series() -> [1, - ---, ---, - ---, ---, ..]
+%%                               3    5      7    9
+%% </pre>
 anharmonic_series() ->
     sign_alternate(inv(odds())).
 
@@ -931,6 +1278,11 @@ anharmonic_series() ->
 -spec grundy_series() -> inflist().
 %% @doc
 %% Grundy series (see Patrick Carmelo Grundy).
+%%
+%% Example:
+%% <pre>
+%% grundy_series() -> [1, -1, 1, -1, 1, -1, ..]
+%% </pre>
 grundy_series() ->
     cycle([1, -1]).
 
@@ -939,6 +1291,11 @@ grundy_series() ->
 -spec facts() -> inflist().
 %% @doc
 %% Factorials series (starts with 0! = 1).
+%%
+%% Example:
+%% <pre>
+%% facts() -> [1, 1, 2!, 3!, 4!, 5!, ..]
+%% </pre>
 facts() ->
     iterate
     (
@@ -955,6 +1312,13 @@ facts() ->
 -spec inv_facts() -> inflist().
 %% @doc
 %% Series of inverted factorials.
+%%
+%% Example:
+%% <pre>
+%%                        1    1    1
+%% inv_facts() -> [1, 1, ---, ---, ---, ..]
+%%                        2!   3!   4!
+%% </pre>
 inv_facts() ->
     inv(facts()).
 
@@ -963,6 +1327,11 @@ inv_facts() ->
 -spec squares() -> inflist().
 %% @doc
 %% Natural squares.
+%%
+%% Example:
+%% <pre>
+%% squares() -> [1, 4, 9, 16, 25, ..]
+%% </pre>
 squares() ->
     square(naturals()).
 
@@ -971,6 +1340,11 @@ squares() ->
 -spec sqrts() -> inflist().
 %% @doc
 %% Square roots of naturals.
+%%
+%% Example:
+%% <pre>
+%% sqrts() -> [1, sqrt(2), sqrt(3), 2, sqrt(5), ..]
+%% </pre>
 sqrts() ->
     sqrt(naturals()).
 
@@ -979,6 +1353,11 @@ sqrts() ->
 -spec cubes() -> inflist().
 %% @doc
 %% Natural cubes.
+%%
+%% Example:
+%% <pre>
+%% cubes() -> [1, 8, 27, 64, 125, ..]
+%% </pre>
 cubes() ->
     cube(naturals()).
 
@@ -987,6 +1366,11 @@ cubes() ->
 -spec triangulars() -> inflist().
 %% @doc
 %% Triangulars numbers.
+%%
+%% Example:
+%% <pre>
+%% triangulars() -> [1, 3, 6, 10, 15, 21, ..]
+%% </pre>
 triangulars() ->
     iterate
     (
@@ -1004,6 +1388,11 @@ triangulars() ->
 -spec primes() -> inflist().
 %% @doc
 %% Prime numbers.
+%%
+%% Example:
+%% <pre>
+%% primes() -> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, ..]
+%% </pre>
 primes() ->
     iterate
     (
@@ -1040,6 +1429,16 @@ primes() ->
 -spec concat(L :: list(), IL :: inflist()) -> inflist().
 %% @doc
 %% Attach list to infinite list from the beginning.
+%%
+%% Example:
+%% <pre>
+%% IL = [a1, a2, a3, a4, a5, ..]
+%% L = [b1, b2, b3]
+%% T - not inflist
+%% 
+%% concat(L, IL) -> [b1, b2, b3, a1, a2, a3, a4, a5, ..]
+%% concat(T, IL) -> [T, a1, a2, a3, a4, a5, ..]
+%% </pre>
 concat([], IL) when is_record(IL, inflist) ->
     IL;
 concat(T, IL) when not is_list(T) ->
@@ -1072,10 +1471,15 @@ concat(L, IL) ->
 -spec sparse(IL :: inflist(), N :: integer()) -> inflist().
 %% @doc
 %% Take sparse infinite list (first element, and then every (N + 1)-th).
-%% For example:
-%% sparse(IL, 0) = IL
-%% sparse([E1, E2, E3, ...], 1) = [E1, E3, E5, ...]
-%% sparse([E1, E2, E3, ...], 2) = [E1, E4, E7, ...]
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a5, ..]
+%%
+%% sparse(A, 0) -> A
+%% sparse(A, 1) -> [a1, a3, a5, ...]
+%% sparse(A, 2) -> [a1, a4, a7, ...]
+%% </pre>
 sparse(IL, 0) when is_record(IL, inflist) ->
     IL;
 sparse(#inflist{h = H, acc = Acc, f = F}, N) when (is_integer(N) andalso (N > 0)) ->
@@ -1103,6 +1507,13 @@ sparse(IL, N) ->
 -spec odds(IL :: inflist()) -> inflist().
 %% @doc
 %% Odd elements of list.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a4, a4, a5, ..]
+%%
+%% odds(A) -> [a1, a3, a5, ..]
+%% </pre>
 odds(IL) ->
     sparse(IL, 1).
 
@@ -1111,6 +1522,13 @@ odds(IL) ->
 -spec evens(IL :: inflist()) -> inflist().
 %% @doc
 %% Even elements of list.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a5, ..]
+%%
+%% evens(A) -> [a2, a4, a6, ..]
+%% </pre>
 evens(IL) ->
     sparse(tl(IL), 1).
 
@@ -1121,6 +1539,14 @@ evens(IL) ->
 -spec merge(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
 %% @doc
 %% Merge two infinite lists.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a5, ..]
+%% B = [b1, b2, b3, b4, b5, ..]
+%%
+%% merge(A, B) -> [a1, b1, a2, b2, a3, b3, a4, b4, ..]
+%% </pre>
 merge(#inflist{h = H1, acc = Acc1, f = F1}, #inflist{h = H2, acc = Acc2, f = F2}) ->
     iterate
     (
@@ -1145,6 +1571,13 @@ merge(IL1, IL2) ->
 -spec unmerge(IL :: inflist()) -> {inflist(), inflist()}.
 %% @doc
 %% Split infinite list to odd and even elements infinite lists.
+%%
+%% Example:
+%% <pre>
+%% A = [a1, a2, a3, a4, a4, ..]
+%%
+%% unmerge(A) -> {[a1, a3, a5, ..], [a2, a4, a6, ..]}
+%% </pre>
 unmerge(IL) ->
     {odds(IL), evens(IL)}.
 
@@ -1156,9 +1589,9 @@ unmerge(IL) ->
 %% @doc
 %% Taylor series of e^x for (-inf, inf).
 %% <pre>
-%%           x    x^2   x^3
-%% e^x = 1 + -  + --- + --- + ...
-%%           1!    2!    3!
+%%                       X    X^2    X^3
+%% taylor_exp(X) -> [1, ---, -----, -----, ..]
+%%                       1!    2!     3!
 %% </pre>
 taylor_exp(X) ->
     dvs(power_series(X), facts()).
@@ -1169,9 +1602,9 @@ taylor_exp(X) ->
 %% @doc
 %% Taylor series of ln(1 + x) for (-1, 1].
 %% <pre>
-%%                 x^2   x^3
-%% ln(x + 1) = x - --- + --- - ...
-%%                  2     3
+%%                                       X^2    X^3      X^4
+%% taylor_lnxp1(X) -> ln(x + 1) = [X, - -----, -----, - -----, ..]
+%%                                        2      3        4
 %% </pre>
 taylor_lnxp1(X) when ((X =< -1) orelse (X > 1)) ->
     throw({badarg, X});
@@ -1184,9 +1617,9 @@ taylor_lnxp1(X) ->
 %% @doc
 %% Taylor series of sin(x) for (-inf, inf).
 %% <pre>
-%%              x^3   x^5
-%% sin(x) = x - --- + --- - ...
-%%               3!    5!
+%%                     x^3   x^5
+%% taylor_sin(X) = x, - -----, + -----, - ...
+%%                      3!    5!
 %% </pre>
 taylor_sin(X) ->
     sign_alternate(evens(taylor_exp(X))).
