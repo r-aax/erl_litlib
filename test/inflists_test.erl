@@ -49,7 +49,7 @@
          % Teylor's series.
          taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1,
          % Monotonic infinite lists actions.
-         mono_union/2, mono_intersection/2, mono_complement/2]).
+         mono_merge/2, mono_unique/1, mono_union/2, mono_intersection/2, mono_complement/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -271,6 +271,19 @@ taylor_test() ->
     ?assert((lists:sum(take(taylor_arctg(V), 10)) - math:atan(V)) < 0.001),
     ok.
 
+%---------------------------------------------------------------------------------------------------
+
+-spec mono_test() -> ok.
+%% @doc
+%% Tests for monotonous infinite lists.
+mono_test() ->
+    A = odds(),
+    B = squares(),
+    ?assert(is_begin(mono_merge(A, B), [1, 1, 3, 4, 5, 7, 9, 9, 11, 13, 15, 16, 17])),
+    ?assert(is_begin(mono_union(A, B), [1, 3, 4, 5, 7, 9, 11, 13, 15, 16, 17])),
+    ?assert(is_begin(mono_intersection(A, B), [1, 9, 25, 49, 81])),
+    ?assert(is_begin(mono_complement(A, B), [3, 5, 7, 11, 13, 15, 17])),
+    ok.
 %---------------------------------------------------------------------------------------------------
 
 -spec other_test() -> ok.

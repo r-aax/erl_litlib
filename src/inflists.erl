@@ -45,7 +45,7 @@
          % Teylor's series.
          taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1,
          % Monotonic infinite lists actions.
-         mono_union/2, mono_intersection/2, mono_complement/2]).
+         mono_merge/2, mono_unique/1, mono_union/2, mono_intersection/2, mono_complement/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -1656,10 +1656,18 @@ taylor_arctg(X) ->
 % Sets operations.
 %---------------------------------------------------------------------------------------------------
 
--spec mono_union(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+-spec mono_merge(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
 %% @doc
-%% Union of two monotonous lists.
-mono_union(IL1, IL2) ->
+%% Merge of two monotonous lists.
+%%
+%% Example:
+%% <pre>
+%% A = [1, 3, 5, 7, 9, ..]
+%% B = [1, 4, 9, 16, 25, ..]
+%%
+%% mono_merge(A, B) -> [1, 1, 3, 4, 5, 7, 9, 9, 11, 13, ..]
+%% </pre>
+mono_merge(IL1, IL2) ->
     IL =
         iterate
         (
@@ -1680,9 +1688,67 @@ mono_union(IL1, IL2) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec mono_unique(IL :: inflist()) -> inflist().
+%% @doc
+%% Take only unique elements of infinite list.
+%% Warning.
+%% This is dangerous function, because it can lead to infinite loop
+%% when list has tail consisting of the same element.
+%%
+%% Example:
+%% <pre>
+%% mono_unique([1, 1, 2, 3, 3, 3, 4, 5, ..]) -> [1, 2, 3, 4, 5, ..]
+%% mono_unique([a, a, a, a, a, ..]) -> infinite loop
+%% </pre>
+mono_unique(#inflist{h = H, acc = Acc, f = F}) ->
+    iterate
+    (
+        H,
+        Acc,
+        fun
+            _F(Cur_H, Cur_Acc) ->
+                {Next_H, Next_Acc} = F(Cur_H, Cur_Acc),
+                if
+                    Next_H =:= Cur_H ->
+                        _F(Next_H, Next_Acc);
+                    true ->
+                        {Next_H, Next_Acc}
+                end
+        end
+    ).
+  
+%---------------------------------------------------------------------------------------------------
+
+-spec mono_union(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+%% @doc
+%% Union of two monotolnous lists.
+%%
+%% Example:
+%% <pre>
+%% A = [1, 3, 5, 7, 9, ..]
+%% B = [1, 4, 9, 16, 25, ..]
+%%
+%% mono_union(A, B) -> [1, 3, 4, 5, 7, 9, 11, 13, ..]
+%% </pre>
+mono_union(IL1, IL2) ->
+    mono_unique(mono_merge(IL1, IL2)).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec mono_intersection(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
 %% @doc
 %% Intersection of two monotonous lists.
+%% Warning.
+%% Dangerous function, because it can lead to infinite loop.
+%%
+%% Example:
+%% <pre>
+%% A = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, ..]
+%% B = [1, 4, 9, 16, 25, ..]
+%%
+%% mono_intersection(A, B) -> [1, 9, 25, ..]
+%% mono_intersection(odds(), evens()) -> infinite loop
+%% </pre>
 mono_intersection(IL1, IL2) ->
     IL =
         iterate
@@ -1709,7 +1775,16 @@ mono_intersection(IL1, IL2) ->
 
 -spec mono_complement(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
 %% @doc
-%% Union of two monotonous lists.
+%% Complement of monotonous infinite lists.
+%% All element of the first list which are not elements of the second list.
+%%
+%% Example:
+%% <pre>
+%% A = [1, 3, 5, 7, 9, 11, 13, ..]
+%% B = [1, 4, 9, 16, 25, ..]
+%%
+%% mono_complement(A, B) -> [3, 5, 7, 11, 13, 15, 17, 19, 21, 23, 27, 29, ..]
+%% </pre>
 mono_complement(IL1, IL2) ->
     IL =
         iterate
