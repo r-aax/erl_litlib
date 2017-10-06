@@ -32,7 +32,8 @@
          pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
          dirichlet_series/1, dirichlet_series/2, sign_alternate/1,
          % Some usefull infinite lists.
-         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
+         fib/0, trib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
+         facts/0, inv_facts/0,
          squares/0, sqrts/0, cubes/0, triangulars/0,
          % Prime numbers.
          primes/0,
@@ -397,7 +398,7 @@ naturals(From) ->
 
 -spec geometric_series(Base :: number(), K :: number()) -> inflist().
 %% @doc
-%% Construct infinite list [Base, Base * K, Base * K^2, ..].
+%% Construct geometric series.
 %%
 %% Example:
 %% <pre>
@@ -527,7 +528,8 @@ zipwith(IL1, IL2, Zip_F) ->
 %% <pre>
 %% IL = [{a1, b1}, {a2, b2}, {a3, b3}, {a4, b4}, {a5, b5}, ..]
 %%
-%% unzip(IL) -> {[a1, a2, a3, a4, a5, ..], [b1, b2, b3, b4, b5, ..]}
+%% unzip(IL) -> {[a1, a2, a3, a4, a5, ..],
+%%               [b1, b2, b3, b4, b5, ..]}
 %% </pre>
 unzip(#inflist{h = {H1, H2}, acc = {Acc1, Acc2}, f = F}) ->
     {
@@ -563,7 +565,9 @@ unzip(IL) ->
 %% <pre>
 %% IL = [{a1, b1, c1}, {a2, b2, c2}, {a3, b3, c3}, {a4, b4, c4}, ..]
 %%
-%% unzip_3(IL) -> {[a1, a2, a3, a4, ..], [b1, b2, b3, b4, ..], [c1, c2, c3, c4, ..]}
+%% unzip_3(IL) -> {[a1, a2, a3, a4, ..],
+%%                 [b1, b2, b3, b4, ..],
+%%                 [c1, c2, c3, c4, ..]}
 %% </pre>
 unzip_3(#inflist{h = {H1, H2, H3}, acc = {Acc1, Acc2, Acc3}, f = F}) ->
     {
@@ -1240,6 +1244,26 @@ fib() ->
         0,
         fun(H, Acc) ->
             {H + Acc, H}
+        end
+    ).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec trib() -> inflist().
+%% @doc
+%% Tribonacci numbers.
+%%
+%% Example:
+%% <pre>
+%% trib() -> [0, 1, 1, 2, 4, 7, 13, 24, 44, ..]
+%% </pre>
+trib() ->
+    iterate
+    (
+        0,
+        {1, 1},
+        fun(H, {A1, A2}) ->
+            {A1, {A2, H + A1 + A2}}
         end
     ).
 

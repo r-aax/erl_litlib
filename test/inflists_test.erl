@@ -36,7 +36,8 @@
          pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
          dirichlet_series/1, dirichlet_series/2, sign_alternate/1,
          % Some usefull infinite lists.
-         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
+         fib/0, trib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
+         facts/0, inv_facts/0,
          squares/0, sqrts/0, cubes/0, triangulars/0,
          % Prime numbers.
          primes/0,
@@ -291,7 +292,8 @@ mono_test() ->
 %% Other functions test.
 other_test() ->
     ?assertEqual([1, -2, 3, -4, 5], take(sign_alternate(naturals()), 5)),
-    ?assertEqual([1, 1, 2, 3, 5, 8, 13], take(fib(), 7)),
+    ?assert(is_begin(fib(), [1, 1, 2, 3, 5, 8, 13])),
+    ?assert(is_begin(trib(), [0, 1, 1, 2, 4, 7, 13, 24, 44])),
     ?assertEqual([1, -1, 1, -1], take(grundy_series(), 4)),
     ok.
 
