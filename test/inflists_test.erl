@@ -19,6 +19,7 @@
          % Get infinite lists parts.
          hd/1, tl/1, ht/1,
          take/2, is_begin/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
+         find/2,
          % Basic simple infinite lists.
          repeat/1, cycle/1,
          % Arithmetic series.
@@ -34,7 +35,7 @@
          mul/2, twice/1, dvs/2, half/1, inv/1, ndvs/2, nhalf/1, nrem/2,
          square/1, sqrt/1, cube/1, pow/2, npow/2,
          % More complex mathematical functions.
-         pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
+         partial_sums/1, partial_products/1, partial_avgs/1,
          dirichlet_series/1, dirichlet_series/2, sign_alternate/1,
          % Some usefull infinite lists.
          fib/0, trib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,

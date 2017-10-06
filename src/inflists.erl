@@ -15,6 +15,7 @@
          % Get infinite lists parts.
          hd/1, tl/1, ht/1,
          take/2, is_begin/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
+         find/2,
          % Basic simple infinite lists.
          repeat/1, cycle/1,
          % Arithmetic series.
@@ -30,7 +31,7 @@
          mul/2, twice/1, dvs/2, half/1, inv/1, ndvs/2, nhalf/1, nrem/2,
          square/1, sqrt/1, cube/1, pow/2, npow/2,
          % More complex mathematical functions.
-         pows/2, npows/2, partial_sums/1, partial_products/1, partial_avgs/1,
+         partial_sums/1, partial_products/1, partial_avgs/1,
          dirichlet_series/1, dirichlet_series/2, sign_alternate/1,
          % Some usefull infinite lists.
          fib/0, trib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
@@ -252,10 +253,35 @@ split(IL, N) ->
       when E :: term().
 %% @doc
 %% Split infinite list by position.
+%% @private
 split(IL, 0, R) ->
     {lists:reverse(R), IL};
 split(IL, N, R) ->
     split(tl(IL), N - 1, [hd(IL) | R]).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec find(IL :: inflist(), FF :: fun((term()) -> boolean())) -> integer().
+%% @doc
+%% Find number of element wich satisfies the given condition.
+%% Warning.
+%% Dangerous function, because list can contain no elements with given condition.
+find(IL, FF) ->
+    find(IL, FF, 1).
+
+-spec find(IL :: inflist(), FF :: fun((term()) -> boolean()), N :: integer()) -> integer().
+%% @doc
+%% Find number of element with satisfies the given condition.
+%% @private
+find(IL, FF, N) ->
+    {H, T} = ht(IL),
+    Is_FF = FF(H),
+    if
+      Is_FF ->
+          N;
+      true ->
+          find(T, FF, N + 1)
+    end.
 
 %---------------------------------------------------------------------------------------------------
 % Basic simple infinite lists.
@@ -773,7 +799,7 @@ add(A, B) ->
         Is_A ->
             map(A, fun(X) -> X + B end);
         Is_B ->
-            map(B, fun(X) -> X + A end);
+            map(B, fun(X) -> A + X end);
         true ->
             throw({badarg, {A, B}})
     end.
@@ -880,7 +906,7 @@ mul(A, B) ->
         Is_A ->
             map(A, fun(X) -> X * B end);
         Is_B ->
-            map(B, fun(X) -> X * A end);
+            map(B, fun(X) -> A * X end);
         true ->
             throw({badarg, {A, B}})
     end.
@@ -1079,81 +1105,75 @@ cube(IL) ->
 
 %---------------------------------------------------------------------------------------------------
 
--spec pow(IL :: inflist(), P :: number()) -> inflist().
+-spec pow(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
 %% @doc
-%% Power of infinite list.
+%% Power calculation.
 %%
 %% Example:
 %% <pre>
 %% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
 %%
-%% pow(A, P) -> [A1^P, A2^P, A3^P, A4^P, A5^P, ..]
+%% pow(A, B) -> [A1^B1, A2^B2, A3^B3, A4^B4, A5^B5, ..]
+%% pow(A, V) -> [A1^V, A2^V, A3^V, A4^V, A5^V, ..]
+%% pow(V, A) -> [V^A1, V^A2, V^A3, V^A4, V^A5, ..]
 %% </pre>
-pow(IL, P) ->
-    map(IL, fun(X) -> math:pow(X, P) end).
+pow(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> math:pow(X, Y) end);
+        Is_A ->
+            map(A, fun(X) -> math:pow(X, B) end);
+        Is_B ->
+            map(B, fun(X) -> math:pow(A, X) end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
 
 %---------------------------------------------------------------------------------------------------
 
--spec npow(IL :: inflist(), P :: number()) -> inflist().
+-spec npow(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
 %% @doc
-%% Power of infinite list (for natural numbers).
+%% Power calculation (in integers).
 %%
 %% Example:
 %% <pre>
 %% A = [A1, A2, A3, A4, A5, ..]
+%% B = [B1, B2, B3, B4, B5, ..]
+%% V - not inflist
 %%
-%% npow(A, P) -> [A1^P, A2^P, A3^P, A4^P, A5^P, ..]
+%% pow(A, B) -> [A1^B1, A2^B2, A3^B3, A4^B4, A5^B5, ..]
+%% pow(A, V) -> [A1^V, A2^V, A3^V, A4^V, A5^V, ..]
+%% pow(V, A) -> [V^A1, V^A2, V^A3, V^A4, V^A5, ..]
 %% </pre>
-npow(IL, 1) ->
-    IL;
-npow(IL, P) when (P > 1) ->
-    mul(IL, npow(IL, P - 1)).
+npow(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
 
-%---------------------------------------------------------------------------------------------------
-% More complex mathematical functions.
-%---------------------------------------------------------------------------------------------------
+    % Function for power calculation in integers.
+    Pow = 
+        fun
+            _Pow(_, 0) ->
+                1;
+            _Pow(N, M) ->
+                N * _Pow(N, M - 1)
+        end,
 
--spec pows(N :: number(), IL :: inflist()) -> inflist().
-%% @doc
-%% Return powers of given number (powers are taken from IL).
-%%
-%% Example:
-%% <pre>
-%% A = [A1, A2, A3, A4, A5, ..]
-%%
-%% pows = [N^A1, N^A2, N^A3, N^A4, N^A5, ..]
-%% </pre>
-pows(N, IL) ->
-    map(IL, fun(X) -> math:pow(N, X) end).
-
-%---------------------------------------------------------------------------------------------------
-
--spec npows(N :: number(), IL :: inflist()) -> inflist().
-%% @doc
-%% Return natural powers of given number (powers are taken from IL).
-%%
-%% Example:
-%% <pre>
-%% A = [A1, A2, A3, A4, A5, ..]
-%%
-%% pows = [N^A1, N^A2, N^A3, N^A4, N^A5, ..]
-%% </pre>
-npows(N, IL) ->
-    map
-    (
-        IL,
-        fun(P) ->
-            N_Pow =
-                fun
-                    % We need x^0 for sequences 1, x, x^2, ..
-                    NP_(_, 0) ->
-                        1;
-                    NP_(N_, P_) when (P_ > 0) ->
-                        N_ * NP_(N_, P_ - 1)
-                end,
-            N_Pow(N, P)
-        end
-    ).
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, Pow);
+        Is_A ->
+            map(A, fun(X) -> Pow(X, B) end);
+        Is_B ->
+            map(B, fun(X) -> Pow(A, X) end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
 
 %---------------------------------------------------------------------------------------------------
 % Partial sums and products of infinite list.
