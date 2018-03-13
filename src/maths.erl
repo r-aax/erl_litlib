@@ -7,7 +7,59 @@
 -module(maths).
 
 % Export.
--export([factorization/1]).
+-export([randf01/0, randf/1, randf/2, randi/1, randi/2, rand_dev/2,
+         factorization/1]).
+
+%---------------------------------------------------------------------------------------------------
+% Random numbers generation.
+%---------------------------------------------------------------------------------------------------
+
+-spec randf01() -> float().
+%% @doc
+%% Generate random float value in [0.0, 1.0] segment.
+randf01() ->
+    rand:uniform().
+
+%---------------------------------------------------------------------------------------------------
+
+-spec randf(H :: float()) -> float().
+%% @doc
+%% Generate random float value in [0.0, H] segment.
+randf(H) ->
+    H * randf01().
+
+%---------------------------------------------------------------------------------------------------
+
+-spec randf(L :: float(), H :: float()) -> float().
+%% @doc
+%% Generate random float value in [L, H] segment.
+randf(L, H) when (H >= L) ->
+    L + randf(H - L).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec randi(H :: integer()) -> integer().
+%% @doc
+%% Generate random integer value in [0, H] segment.
+randi(H) ->
+    rand:uniform(H + 1) - 1.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec randi(L :: integer(), H :: integer()) -> integer().
+%% @doc
+%% Generate random integer value in [L, H] segment.
+randi(L, H) when (H >= L) ->
+    L + randi(H - L).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec rand_dev(V :: float(), D :: float()) -> float().
+%% @doc
+%% Generate random value from [V - abs(V * D), V + abs(V* D)] segment.
+rand_dev(V, D) ->
+    Dev = abs(V * D),
+    randf(V - Dev, V + Dev).
 
 %---------------------------------------------------------------------------------------------------
 % Factorization.
